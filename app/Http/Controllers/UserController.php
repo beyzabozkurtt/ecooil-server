@@ -67,7 +67,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $user->update($request->all());
     }
 
     /**

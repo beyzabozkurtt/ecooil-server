@@ -13,6 +13,7 @@ export interface User extends IModel {
     name: string;
     surname: string;
     email: string;
+    password: string;
     phone: string;
     role: string;
     profile_photo_url: string;

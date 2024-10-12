@@ -2,7 +2,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import {useEffect, useState} from "react";
 import {User, Address, Appointment, Transaction} from "@/types";
-import AddThingsModal from "@/Components/AddThingsModal";
 
 export default function Dashboard() {
     const [allUsers, setAllUsers] = useState<User[]>([])
@@ -10,9 +9,8 @@ export default function Dashboard() {
     const [allAppointments, setAllAppointments] = useState<Appointment[]>([])
     const [allTransactions, setAllTransactions] = useState<Transaction[]>([])
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-
+    // Add User Panel
     const [username, setUsername] = useState("");
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
@@ -22,6 +20,70 @@ export default function Dashboard() {
     const [role, setRole] = useState("");
     const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
 
+    const [selectedUser, setSelectedUser] = useState<User>();
+
+    // Edit User Panel
+    const [editUsername, setEditUsername] = useState("");
+    const [editName, setEditName] = useState("");
+    const [editSurname, setEditSurname] = useState("");
+    const [editEmail, setEditEmail] = useState("");
+    const [editPassword, setEditPassword] = useState("");
+    const [editTelephone, setEditTelephone] = useState("");
+    const [editRole, setEditRole] = useState("");
+    const [editProfilePhotoUrl, setEditProfilePhotoUrl] = useState("");
+
+    useEffect(() => {
+        if (selectedUser) {
+            setEditUsername(selectedUser.username);
+            setEditName(selectedUser.name);
+            setEditSurname(selectedUser.surname);
+            setEditEmail(selectedUser.email);
+            setEditPassword(selectedUser.password);
+            setEditTelephone(selectedUser.phone);
+            setEditRole(selectedUser.role);
+            setEditProfilePhotoUrl(selectedUser.profile_photo_url);
+        }
+    }, [selectedUser]);
+
+    const handleEditUser = () => {
+        if (!selectedUser) {
+            return;
+        }
+
+        const formData = {
+            username: editUsername,
+            name: editName,
+            surname: editSurname,
+            email: editEmail,
+            password: editPassword,
+            phone: editTelephone,
+            role: editRole,
+            profile_photo_url: editProfilePhotoUrl,
+        };
+
+        fetch('/api/users/' + selectedUser.id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(JSON.stringify(errorData));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    setAllUsers(allUsers.map(user => user.id === selectedUser.id ? data : user))
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
 
     const handleAddUser = () => {
         const formData = {
@@ -52,20 +114,19 @@ export default function Dashboard() {
             .then(data => {
                 if (data) {
                     setAllUsers([...allUsers, data]);
-                    closeModal();
+                    setUsername("");
+                    setName("");
+                    setSurname("");
+                    setEmail("");
+                    setPassword("");
+                    setTelephone("");
+                    setRole("");
+                    setProfilePhotoUrl("");
                 }
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
-    };
-
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
     };
 
     useEffect(() => {
@@ -136,19 +197,6 @@ export default function Dashboard() {
 
     return (
         <div>
-            {/*Modal*/}
-            {/*<div className={"flex items-center justify-between relative"}>*/}
-            {/*    {isModalOpen && (*/}
-            {/*        <AddThingsModal*/}
-            {/*            name="Kullanıcı Ekle"*/}
-            {/*            inputCount={8}*/}
-            {/*            labels={['Kullanıcı Adı', 'İsim', 'Soyisim', 'Email', 'Parola', 'Telefon', 'Rol', 'Profil Fotoğrafı URL']}*/}
-            {/*            closeModal={closeModal}*/}
-            {/*            onSubmit={handleAddUser}*/}
-            {/*        />*/}
-            {/*    )}*/}
-            {/*</div>*/}
-
             <AuthenticatedLayout
                 header={
                     <div className={"flex justify-between items-center"}>
@@ -156,31 +204,31 @@ export default function Dashboard() {
                             Control Panel
                         </h2>
 
-                        <div className={"flex gap-2"}>
-                            <div
-                                className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}
-                                onClick={openModal}
-                            >
-                                Kullanıcı Ekle
-                            </div>
+                        {/*<div className={"flex gap-2"}>*/}
+                        {/*    <div*/}
+                        {/*        className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}*/}
+                        {/*        onClick={openModal}*/}
+                        {/*    >*/}
+                        {/*        Kullanıcı Ekle*/}
+                        {/*    </div>*/}
 
-                            <div className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}>
-                                Adres Ekle
-                            </div>
+                        {/*    <div className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}>*/}
+                        {/*        Adres Ekle*/}
+                        {/*    </div>*/}
 
-                            <div className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}>
-                                Randevu Ekle
-                            </div>
+                        {/*    <div className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}>*/}
+                        {/*        Randevu Ekle*/}
+                        {/*    </div>*/}
 
-                            <div className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}>
-                                İşlem Ekle
-                            </div>
-                        </div>
+                        {/*    <div className={"p-2 bg-green-500 text-white font-bold rounded cursor-pointer"}>*/}
+                        {/*        İşlem Ekle*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
                     </div>
                 }
             >
-                <div className="w-min mx-16 mt-6 p-4 bg-white">
-                    <div>
+                <div className="w-min mx-12 mt-6 p-4 flex gap-12">
+                    <div className={"bg-green-100 p-6 rounded-xl"}>
                         <div className={"text-xl mb-2"}>Kullanıcı Ekle</div>
                         <div className={"flex gap-2"}>
                             <div className={"gap-2 flex flex-col"}>
@@ -246,8 +294,81 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div
-                            className={"w-full flex items-center justify-center bg-green-500 mt-2 py-2 text-xl rounded cursor-pointer"}
+                            className={"w-full flex items-center justify-center bg-green-500 mt-2 py-2 text-xl rounded cursor-pointer hover:ring transition duration-300 ring-green-400 ring-1"}
                             onClick={handleAddUser}
+                        >
+                            Kaydet
+                        </div>
+                    </div>
+
+                    <div className={"bg-orange-100 p-6 rounded-xl"}>
+                        <div className={"text-xl mb-2"}>Kullanıcı Düzenle</div>
+                        <div className={"flex gap-2"}>
+                            <div className={"gap-2 flex flex-col"}>
+                                <input
+                                    type="text"
+                                    placeholder="Kullanıcı Adı"
+                                    className={"border p-2 rounded-md"}
+                                    value={editUsername}
+                                    onChange={(e) => setEditUsername(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="İsim"
+                                    className={"border p-2 rounded-md"}
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Soyisim"
+                                    className={"border p-2 rounded-md"}
+                                    value={editSurname}
+                                    onChange={(e) => setEditSurname(e.target.value)}
+                                />
+                                <input
+                                    type="email"
+                                    placeholder="Email"
+                                    className={"border p-2 rounded-md"}
+                                    value={editEmail}
+                                    onChange={(e) => setEditEmail(e.target.value)}
+                                />
+                            </div>
+                            <div className={"gap-2 flex flex-col"}>
+                                <input
+                                    type="password"
+                                    placeholder="Parola"
+                                    className={"border p-2 rounded-md"}
+                                    value={editPassword}
+                                    onChange={(e) => setEditPassword(e.target.value)}
+                                />
+                                <input
+                                    type="tel"
+                                    maxLength={10}
+                                    placeholder="Telefon"
+                                    className={"border p-2 rounded-md"}
+                                    value={editTelephone}
+                                    onChange={(e) => setEditTelephone(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Rol"
+                                    className={"border p-2 rounded-md"}
+                                    value={editRole}
+                                    onChange={(e) => setEditRole(e.target.value)}
+                                />
+                                <input
+                                    type="url"
+                                    placeholder="Profil Fotoğrafı URL"
+                                    className={"border p-2 rounded-md"}
+                                    value={editProfilePhotoUrl}
+                                    onChange={(e) => setEditProfilePhotoUrl(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div
+                            className={"w-full flex items-center justify-center bg-orange-500 mt-2 py-2 text-xl rounded cursor-pointer hover:ring transition duration-300 ring-orange-400 ring-1"}
+                            onClick={handleEditUser}
                         >
                             Kaydet
                         </div>
@@ -276,7 +397,11 @@ export default function Dashboard() {
                             </thead>
                             <tbody>
                             {allUsers.map((user) => (
-                                <tr key={user.id} className={"border-b-[1px]"}>
+                                <tr
+                                    key={user.id}
+                                    className={`border-b-[1px] cursor-pointer ${selectedUser?.id === user.id ? 'bg-gray-100' : ''}`}
+                                    onClick={() => setSelectedUser(user)}
+                                >
                                     <td className={"p-2 border-r-[1px]"}>{user.id}</td>
                                     <td className={"p-2 border-r-[1px]"}>{user.username}</td>
                                     <td className={"p-2 border-r-[1px]"}>{user.name}</td>
