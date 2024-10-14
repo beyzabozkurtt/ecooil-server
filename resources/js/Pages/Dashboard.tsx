@@ -367,7 +367,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div
-                            className={"w-full flex items-center justify-center bg-orange-500 mt-2 py-2 text-xl rounded cursor-pointer hover:ring transition duration-300 ring-orange-400 ring-1"}
+                            className={"w-full flex items-center justify-center bg-orange-500 mt-2 py-2 text-xl rounded cursor-pointer hover:scale-105 transition duration-300"}
                             onClick={handleEditUser}
                         >
                             Kaydet

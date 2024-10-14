@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -18,3 +19,5 @@ Route::resource('addresses', AddressController::class);
 Route::resource('appointments', AppointmentController::class);
 
 Route::resource('transactions', TransactionController::class);
+
+Route::post('/login', [AuthController::class, 'login']);
