@@ -21,3 +21,4 @@ Route::resource('appointments', AppointmentController::class);
 Route::resource('transactions', TransactionController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);

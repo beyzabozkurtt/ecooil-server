@@ -28,5 +28,30 @@ class AuthController extends Controller
         }
 
         return response()->json($user);
+
+    }
+
+    //    register with username name surname email or phone number and password
+    public function register(Request $request): JsonResponse
+    {
+        $request->validate([
+            'username' => 'required|string|unique:users',
+            'name' => 'required|string',
+            'surname' => 'required|string',
+            'email' => 'required_without:phone|string|email|unique:users',
+            'phone' => 'required_without:email|string|unique:users',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::create([
+            'username' => $request->username,
+            'name' => $request->name,
+            'surname' => $request->surname,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json($user);
     }
 }
