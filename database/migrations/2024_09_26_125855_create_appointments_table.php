@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade');
             $table->string('address');
             $table->dateTime('date');
+            $table->float("amount");
             $table->timestamps();
         });
     }

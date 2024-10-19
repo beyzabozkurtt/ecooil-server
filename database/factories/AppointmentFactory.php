@@ -21,6 +21,7 @@ class AppointmentFactory extends Factory
             'user_id' => fake()->numberBetween(1, 10),
             'address' => fake()->address(),
             'date' => fake()->dateTime(),
+            'amount' => fake()->randomFloat(1, 5, 26),
         ];
     }
 }

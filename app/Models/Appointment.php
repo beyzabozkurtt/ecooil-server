@@ -14,6 +14,7 @@ class Appointment extends Model
         'user_id',
         'address',
         'date',
+        'amount',
     ];
 
     public function user(): BelongsTo
