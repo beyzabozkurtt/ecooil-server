@@ -21,7 +21,7 @@ class AddressController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -29,7 +29,14 @@ class AddressController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'address_name' => 'required|string',
+            'address_line_1' => 'required|string',
+            'user_id' => 'required|integer',
+        ]);
+
+        $address = Address::create($request->all());
+        return response()->json($address);
     }
 
     /**

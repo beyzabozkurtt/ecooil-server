@@ -23,6 +23,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'phone' => '12345678901',
         ]);
+        User::factory()->create([
+            'username' => 'beyza founder',
+            'name' => 'Beyzoş',
+            'surname' => 'Bozkurt',
+            'email' => 'beyza@beyza.com',
+            'phone' => '12345678901',
+        ]);
+
 
         Address::factory()->create([
             'address_name' => 'Test Address 1',
