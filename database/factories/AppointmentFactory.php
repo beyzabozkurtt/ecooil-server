@@ -18,8 +18,9 @@ class AppointmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => fake()->numberBetween(1, 10),
-            'address' => fake()->address(),
+            'customer_id' => fake()->numberBetween(1, 10),
+            'collector_id' => fake()->numberBetween(1, 10),
+            'address_id' => fake()->numberBetween(1, 10),
             'date' => fake()->dateTime(),
             'amount' => fake()->randomFloat(1, 5, 26),
         ];

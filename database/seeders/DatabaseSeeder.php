@@ -23,14 +23,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'phone' => '12345678901',
         ]);
-        User::factory()->create([
-            'username' => 'beyza founder',
-            'name' => 'Beyzoş',
-            'surname' => 'Bozkurt',
-            'email' => 'beyza@beyza.com',
-            'phone' => '12345678901',
-        ]);
-
 
         Address::factory()->create([
             'address_name' => 'Test Address 1',
@@ -44,5 +36,6 @@ class DatabaseSeeder extends Seeder
         Address::factory(10)->create();
         Appointment::factory(10)->create();
         Transaction::factory(10)->create();
+
     }
 }

@@ -32,6 +32,14 @@ export default function Dashboard() {
     const [editRole, setEditRole] = useState("");
     const [editProfilePhotoUrl, setEditProfilePhotoUrl] = useState("");
 
+    // Add Appointment Panel
+    const [customerID, setCustomerID] = useState("");
+    const [collectorID, setCollectorID] = useState("");
+    const [AppointmentAddressId, setAppointmentAddressId] = useState("");
+    const [date, setDate] = useState("");
+    const [amount, setAmount] = useState("");
+
+
     useEffect(() => {
         if (selectedUser) {
             setEditUsername(selectedUser.username);
@@ -127,6 +135,54 @@ export default function Dashboard() {
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
+    };
+
+    const handleAddAppointment = () => {
+        const formData = {
+            customer_id: customerID,
+            address_id: AppointmentAddressId,
+            date: formatDateTime(date),
+            amount,
+            ...(collectorID && { collector_id: collectorID }),
+        };
+
+        fetch('/api/add_appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(JSON.stringify(errorData));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    setAllAppointments([...allAppointments, data]);
+                    setCustomerID("");
+                    setCollectorID("");
+                    setAppointmentAddressId("");
+                    setDate("");
+                    setAmount("");
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+    const formatDateTime = (dateTime: string): string => {
+        const date = new Date(dateTime);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     };
 
     useEffect(() => {
@@ -227,10 +283,11 @@ export default function Dashboard() {
                     </div>
                 }
             >
-                <div className="w-min mx-12 mt-6 p-4 flex gap-12">
+                <div className="w-min mx-12 mt-6 p-4 flex gap-4">
+                    {/*Kullanıcı ekle*/}
                     <div className={"bg-green-100 p-6 rounded-xl"}>
                         <div className={"text-xl mb-2"}>Kullanıcı Ekle</div>
-                        <div className={"flex gap-2"}>
+                        <div className={"flex gap-1"}>
                             <div className={"gap-2 flex flex-col"}>
                                 <input
                                     type="text"
@@ -301,6 +358,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
+                    {/*Kullanıcı düzenle*/}
                     <div className={"bg-orange-100 p-6 rounded-xl"}>
                         <div className={"text-xl mb-2"}>Kullanıcı Düzenle</div>
                         <div className={"flex gap-2"}>
@@ -373,6 +431,60 @@ export default function Dashboard() {
                             Kaydet
                         </div>
                     </div>
+
+                    {/*Randevu ekle*/}
+                    <div className={"bg-blue-100 p-6 rounded-xl flex justify-between flex-col"}>
+                        <div className={"text-xl mb-2"}>Randevu ekle</div>
+                        <div className={"flex gap-2"}>
+                            <div className={"gap-2 flex flex-col"}>
+                                <input
+                                    type="number"
+                                    placeholder="Customer ID"
+                                    className={"border p-2 rounded-md"}
+                                    value={customerID}
+                                    onChange={(e) => setCustomerID(e.target.value)}
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="Collector ID"
+                                    className={"border p-2 rounded-md"}
+                                    value={collectorID}
+                                    onChange={(e) => setCollectorID(e.target.value)}
+                                />
+                            </div>
+                            <div className={"gap-2 flex flex-col"}>
+                                <input
+                                    type="datetime-local"
+                                    placeholder="Date and Time"
+                                    className={"border p-2 rounded-md"}
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                />
+                                <input
+                                    type="number"
+                                    maxLength={10}
+                                    placeholder="Amount"
+                                    className={"border p-2 rounded-md"}
+                                    value={amount}
+                                    onChange={(e) => setAmount(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <input
+                                type="number"
+                                placeholder="Address ID"
+                                className={"border p-2 rounded-md w-full"}
+                                value={AppointmentAddressId}
+                                onChange={(e) => setAppointmentAddressId(e.target.value)}
+                            />
+                        </div>
+                        <div
+                            className={"w-full flex items-center justify-center bg-blue-500 mt-2 py-2 text-xl rounded cursor-pointer hover:scale-105 transition duration-300"}
+                            onClick={handleAddAppointment}>
+                            Kaydet
+                        </div>
+                    </div>
                 </div>
 
                 <Head title="Dashboard"/>
@@ -399,7 +511,7 @@ export default function Dashboard() {
                             {allUsers.map((user) => (
                                 <tr
                                     key={user.id}
-                                    className={`border-b-[1px] cursor-pointer ${selectedUser?.id === user.id ? 'bg-gray-100' : ''}`}
+                                    className={`border-b-[1px] cursor-pointer ${selectedUser?.id === user.id ? 'bg-gray-100' : ''} hover:bg-gray-100 transition duration-100`}
                                     onClick={() => setSelectedUser(user)}
                                 >
                                     <td className={"p-2 border-r-[1px]"}>{user.id}</td>
@@ -409,7 +521,7 @@ export default function Dashboard() {
                                     <td className={"p-2 border-r-[1px]"}>{user.email}</td>
                                     <td className={"p-2 border-r-[1px]"}>{user.phone}</td>
                                     <td className={"p-2 border-r-[1px]"}>{user.profile_photo_url}</td>
-                                    <td className={"p-2"}>
+                                    <td className={"p-2 flex justify-end"}>
                                         <button onClick={() => DeleteUserHandler(user.id)}
                                                 className={"bg-red-500 text-white p-2 rounded-md"}>Delete
                                         </button>
@@ -428,9 +540,9 @@ export default function Dashboard() {
                             <thead>
                             <tr>
                                 <th className={"text-left border-b-[1px] p-2"}>ID</th>
+                                <th className={"text-left border-b-[1px] p-2"}>User ID</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Address Name</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Address Line 1</th>
-                                <th className={"text-left border-b-[1px] p-2"}>User ID</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Latitude</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Longitude</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Action</th>
@@ -440,12 +552,12 @@ export default function Dashboard() {
                             {allAddresses.map((address) => (
                                 <tr key={address.id} className={"border-b-[1px]"}>
                                     <td className={"p-2 border-r-[1px]"}>{address.id}</td>
+                                    <td className={"p-2 border-r-[1px]"}>{address.user_id}</td>
                                     <td className={"p-2 border-r-[1px]"}>{address.address_name}</td>
                                     <td className={"p-2 border-r-[1px]"}>{address.address_line_1}</td>
-                                    <td className={"p-2 border-r-[1px]"}>{address.user_id}</td>
                                     <td className={"p-2 border-r-[1px]"}>{address.latitude}</td>
                                     <td className={"p-2 border-r-[1px]"}>{address.longitude}</td>
-                                    <td className={"p-2"}>
+                                    <td className={"p-2 flex justify-end"}>
                                         <button onClick={() => DeleteAddressHandler(address.id)}
                                                 className={"bg-red-500 text-white p-2 rounded-md"}>Delete
                                         </button>
@@ -464,9 +576,11 @@ export default function Dashboard() {
                             <thead>
                             <tr>
                                 <th className={"text-left border-b-[1px] p-2"}>ID</th>
-                                <th className={"text-left border-b-[1px] p-2"}>User ID</th>
-                                <th className={"text-left border-b-[1px] p-2"}>Address</th>
+                                <th className={"text-left border-b-[1px] p-2"}>Customer ID</th>
+                                <th className={"text-left border-b-[1px] p-2"}>Collector ID</th>
+                                <th className={"text-left border-b-[1px] p-2"}>Address ID</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Date</th>
+                                <th className={"text-left border-b-[1px] p-2"}>Amount</th>
                                 <th className={"text-left border-b-[1px] p-2"}>Action</th>
                             </tr>
                             </thead>
@@ -474,10 +588,12 @@ export default function Dashboard() {
                             {allAppointments.map((appointment) => (
                                 <tr key={appointment.id} className={"border-b-[1px]"}>
                                     <td className={"p-2 border-r-[1px]"}>{appointment.id}</td>
-                                    <td className={"p-2 border-r-[1px]"}>{appointment.user_id}</td>
-                                    <td className={"p-2 border-r-[1px]"}>{appointment.address}</td>
+                                    <td className={"p-2 border-r-[1px]"}>{appointment.customer_id}</td>
+                                    <td className={"p-2 border-r-[1px]"}>{appointment.collector_id}</td>
+                                    <td className={"p-2 border-r-[1px]"}>{appointment.address_id}</td>
                                     <td className={"p-2 border-r-[1px]"}>{appointment.date}</td>
-                                    <td className={"p-2"}>
+                                    <td className={"p-2 border-r-[1px]"}>{appointment.amount}</td>
+                                    <td className={"p-2 flex justify-end"}>
                                         <button onClick={() => DeleteAppointmentsHandler(appointment.id)}
                                                 className={"bg-red-500 text-white p-2 rounded-md"}>Delete
                                         </button>
@@ -513,7 +629,7 @@ export default function Dashboard() {
                                     <td className={"p-2 border-r-[1px]"}>{transaction.address_id}</td>
                                     <td className={"p-2 border-r-[1px]"}>{transaction.appointment_id}</td>
                                     <td className={"p-2 border-r-[1px]"}>{transaction.points}</td>
-                                    <td className={"p-2"}>
+                                    <td className={"p-2 flex justify-end"}>
                                         <button onClick={() => DeleteTransactionsHandler(transaction.id)}
                                                 className={"bg-red-500 text-white p-2 rounded-md"}>Delete
                                         </button>

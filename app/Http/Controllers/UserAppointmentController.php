@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class UserAppointmentController extends Controller
 {
-    public function user_appointments($user_id)
+    public function user_appointments($user_id): JsonResponse
     {
         $appointments = Appointment::where('user_id', $user_id)->get();
         return response()->json($appointments);
@@ -17,8 +17,9 @@ class UserAppointmentController extends Controller
     public function add_appointment(Request $request): JsonResponse
     {
         $request->validate([
-            'user_id' => 'required|integer',
-            'address' => 'required|string',
+            'customer_id' => 'required|integer',
+            'collector_id' => 'nullable|integer',
+            'address_id' => 'required|integer',
             'date' => 'required|date',
             'amount' => 'required|numeric',
         ]);

@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    //    login with email or phone number and password
-
     public function login(Request $request): JsonResponse
     {
         $request->validate([

@@ -29,9 +29,11 @@ export interface Address extends IModel {
 }
 
 export interface Appointment extends IModel {
-    user_id: number;
-    address: string;
+    customer_id: number;
+    collector_id: number;
+    address_id: number;
     date: string;
+    amount: number;
 }
 
 export interface Transaction extends IModel {

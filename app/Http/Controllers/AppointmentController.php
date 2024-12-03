@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use GuzzleHttp\Psr7\Response;
+use http\Client\Curl\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -38,7 +40,7 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        //
+        return response()->json($appointment);
     }
 
     /**
@@ -63,5 +65,33 @@ class AppointmentController extends Controller
     public function destroy(Appointment $appointment)
     {
         $appointment->delete();
+    }
+
+    public function userAppointments($user_id): JsonResponse
+    {
+        $user = \App\Models\User::find($user_id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        if ($user->role == 'collector') {
+            $appointments = Appointment::where('collector_id', $user_id)->get();
+            return response()->json($appointments);
+        }
+        $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->get();
+        return response()->json($appointments);
+    }
+
+    public function userLatestAppointment($user_id)
+    {
+        $user = \App\Models\User::find($user_id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        if ($user->role == 'collector') {
+            $appointment = Appointment::where('collector_id', $user_id)->latest()->first();
+            return response()->json($appointment);
+        }
+        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->latest()->first();
+        return response()->json($appointment);
     }
 }

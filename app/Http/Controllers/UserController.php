@@ -33,7 +33,7 @@ class UserController extends Controller
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
                 'phone' => 'nullable|string|max:15',
-                'role' => ['required', Rule::in(['user', 'admin'])],
+                'role' => ['required', Rule::in(['user', 'admin', 'collector'])],
                 'profile_photo_url' => 'nullable|url',
             ]);
 
