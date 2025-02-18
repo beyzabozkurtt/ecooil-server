@@ -15,7 +15,12 @@ class Address extends Model
         'address_line_1',
         'user_id',
         'latitude',
-        'longitude',
+        'longitude'
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function user(): BelongsTo

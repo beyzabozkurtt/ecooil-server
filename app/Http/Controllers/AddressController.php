@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AddressController extends Controller
 {
@@ -29,14 +30,39 @@ class AddressController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'address_name' => 'required|string',
+        $validated = $request->validate([
+            'address_name' => 'required|string|max:255',
             'address_line_1' => 'required|string',
-            'user_id' => 'required|integer',
+            'user_id' => 'required|exists:users,id'
         ]);
 
-        $address = Address::create($request->all());
-        return response()->json($address);
+        // Nominatim API isteği
+        $response = Http::withHeaders([
+            'User-Agent' => 'EcoOil/1.0 (a.hakan.cansizz@email.com)' // Zorunlu header
+        ])->get('https://nominatim.openstreetmap.org/search', [
+            'q' => $validated['address_line_1'],
+            'format' => 'json',
+            'limit' => 1,
+            'addressdetails' => 1
+        ]);
+
+        $data = $response->json();
+
+        if (!empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
+            $validated['latitude'] = (float)$data[0]['lat'];
+            $validated['longitude'] = (float)$data[0]['lon'];
+        } else {
+            // Hata durumu
+            $validated['latitude'] = null;
+            $validated['longitude'] = null;
+        }
+
+        $address = Address::create($validated);
+
+        return response()->json([
+            'message' => 'Address created successfully',
+            'data' => $address
+        ], 201);
     }
 
     /**
