@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Transaction;
 use GuzzleHttp\Psr7\Response;
 use http\Client\Curl\User;
 use Illuminate\Http\JsonResponse;
@@ -74,14 +75,24 @@ class AppointmentController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
         if ($user->role == 'collector') {
-            $appointments = Appointment::where('collector_id', $user_id)->get();
+            $transactions = Transaction::where('user_id', $user_id)->get();
+            $transaction_ids = $transactions->pluck('appointment_id')->toArray();
+
+            $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
+
             return response()->json($appointments);
         }
-        $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->get();
+
+        // filter if appointment id is in transactions
+        $transactions = Transaction::where('user_id', $user_id)->get();
+        $transaction_ids = $transactions->pluck('appointment_id')->toArray();
+
+        $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
+
         return response()->json($appointments);
     }
 
-    public function userLatestAppointment($user_id)
+    public function userLatestAppointment($user_id): JsonResponse
     {
         $user = \App\Models\User::find($user_id);
         if (!$user) {
@@ -91,7 +102,17 @@ class AppointmentController extends Controller
             $appointment = Appointment::where('collector_id', $user_id)->latest()->first();
             return response()->json($appointment);
         }
-        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->latest()->first();
+
+        // filter if appointment id is in transactions
+        $transactions = Transaction::where('user_id', $user_id)->get();
+        $transaction_ids = $transactions->pluck('appointment_id')->toArray();
+
+        $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
+
+//        get latest appointment
+        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->latest()->first();
+
+//        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->latest()->first();
         return response()->json($appointment);
     }
 }

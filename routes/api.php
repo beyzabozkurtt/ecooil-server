@@ -32,3 +32,5 @@ Route::get('/userAppointments/{user_id}', [AppointmentController::class, 'userAp
 Route::get('userLatestAppointment/{user_id}', [AppointmentController::class, 'userLatestAppointment']);
 
 Route::get('/user_addresses/{user_id}', [UserAddress::class, 'addresses']);
+
+

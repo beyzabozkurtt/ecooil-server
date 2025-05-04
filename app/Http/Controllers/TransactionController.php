@@ -29,7 +29,16 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'amount' => 'required|numeric',
+            'user_id' => 'required|integer',
+            'address_id' => 'required|integer',
+            'appointment_id' => 'required|integer',
+            'points' => 'required|integer',
+        ]);
+
+        $transaction = Transaction::create($request->all());
+        return response()->json($transaction, 201);
     }
 
     /**
@@ -37,7 +46,7 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        //
+
     }
 
     /**

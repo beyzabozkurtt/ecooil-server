@@ -4,6 +4,8 @@ import {useEffect, useState} from "react";
 import {User, Address, Appointment, Transaction} from "@/types";
 
 export default function Dashboard() {
+    const windowWidth = window.innerWidth;
+
     const [allUsers, setAllUsers] = useState<User[]>([])
     const [allAddresses, setAllAddresses] = useState<Address[]>([])
     const [allAppointments, setAllAppointments] = useState<Appointment[]>([])
@@ -283,7 +285,7 @@ export default function Dashboard() {
                     </div>
                 }
             >
-                <div className="w-min mx-12 mt-6 p-4 flex gap-4">
+                <div className={`width-[${windowWidth}] mx-12 mt-6 p-4 flex gap-4 overflow-x-auto`}>
                     {/*Kullanıcı ekle*/}
                     <div className={"bg-green-100 p-6 rounded-xl"}>
                         <div className={"text-xl mb-2"}>Kullanıcı Ekle</div>
@@ -485,6 +487,8 @@ export default function Dashboard() {
                             Kaydet
                         </div>
                     </div>
+
+                    {/*İşlem ekle*/}
                 </div>
 
                 <Head title="Dashboard"/>
