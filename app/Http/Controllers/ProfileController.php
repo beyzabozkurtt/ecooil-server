@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,5 +61,28 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function updateUser($user_id): JsonResponse
+    {
+        $user = User::all()->find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update([
+            'username' => request('username'),
+            'name' => request('name'),
+            'surname' => request('surname'),
+            'email' => request('email'),
+            'phone' => request('phone'),
+            'role' => request('role'),
+            'profile_photo_url' => request('profile_photo_url'),
+        ]);
+
+        $user->save();
+
+        return response()->json($user);
     }
 }

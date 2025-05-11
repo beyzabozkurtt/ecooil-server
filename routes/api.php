@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserAddress;
 use App\Http\Controllers\UserAppointmentController;
@@ -33,4 +34,6 @@ Route::get('userLatestAppointment/{user_id}', [AppointmentController::class, 'us
 
 Route::get('/user_addresses/{user_id}', [UserAddress::class, 'addresses']);
 
+Route::post('/updateUser/{user_id}', [ProfileController::class, 'updateUser']);
 
+Route::get('/totalUserCount', [UserController::class, 'totalUserCount']);

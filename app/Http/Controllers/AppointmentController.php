@@ -78,8 +78,8 @@ class AppointmentController extends Controller
             $transactions = Transaction::where('user_id', $user_id)->get();
             $transaction_ids = $transactions->pluck('appointment_id')->toArray();
 
-            $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
-
+            $appointments = Appointment::query()->with('address')->where('collector_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
+//            $appointments = Appointment::query()->where('collector_id', $user_id)->get();
             return response()->json($appointments);
         }
 
@@ -88,6 +88,7 @@ class AppointmentController extends Controller
         $transaction_ids = $transactions->pluck('appointment_id')->toArray();
 
         $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
+//        $appointments = Appointment::query()->where('customer_id', $user_id)->get();
 
         return response()->json($appointments);
     }
@@ -99,8 +100,13 @@ class AppointmentController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
         if ($user->role == 'collector') {
-            $appointment = Appointment::where('collector_id', $user_id)->latest()->first();
-            return response()->json($appointment);
+//            $appointment = Appointment::query()->with('address')->where('collector_id', $user_id)->latest()->first();
+            $transactions = Transaction::where('user_id', $user_id)->get();
+            $transaction_ids = $transactions->pluck('appointment_id')->toArray();
+
+            $appointments = Appointment::query()->with('address')->where('collector_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
+
+            return response()->json($appointments);
         }
 
         // filter if appointment id is in transactions
@@ -110,9 +116,9 @@ class AppointmentController extends Controller
         $appointments = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->get();
 
 //        get latest appointment
-        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->latest()->first();
+//        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->whereNotIn('id', $transaction_ids)->latest()->first();
 
 //        $appointment = Appointment::query()->with('address')->where('customer_id', $user_id)->latest()->first();
-        return response()->json($appointment);
+        return response()->json($appointments);
     }
 }
