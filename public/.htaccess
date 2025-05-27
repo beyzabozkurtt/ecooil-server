@@ -5,16 +5,16 @@
 
     RewriteEngine On
 
-    # Handle Authorization Header
+    # Authorization Header'ı düzgün ilet
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Eğer istek klasör değilse, sonda olan eğik çizgiyi kaldır
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # Eğer istek dosya veya klasör değilse, index.php'ye yönlendir
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
