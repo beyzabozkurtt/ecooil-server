@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ecooil-server
+    env: docker
+    plan: free
+    branch: main
+    dockerfilePath: Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    autoDeploy: true
