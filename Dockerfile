@@ -1,33 +1,30 @@
-# Laravel için resmi PHP imajını kullanıyoruz
-FROM php:8.2-apache
+FROM php:8.3-apache
 
-# Gerekli sistem paketlerini yükle
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
     git \
     curl \
     sqlite3 \
-    && docker-php-ext-install zip pdo pdo_sqlite
+    libsqlite3-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    && docker-php-ext-install pdo pdo_sqlite zip \
+    && apt-get clean
 
-# Composer kurulumu
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Apache için Laravel public dizinini ayarla
 WORKDIR /var/www/html
 
-# Laravel dosyalarını kopyala
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 COPY . .
 
-# Laravel için gerekli izinleri ver
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/storage
 
-# Laravel yapılandırma ve önbellek işlemleri
 RUN composer install --no-dev --optimize-autoloader \
     && php artisan config:cache \
-    && php artisan storage:link || true
+    && php artisan migrate --force || true
 
 EXPOSE 80
 
