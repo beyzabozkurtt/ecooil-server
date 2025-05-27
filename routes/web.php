@@ -25,3 +25,16 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+use Illuminate\Support\Facades\File;
+
+Route::get('/debug-log', function () {
+    $logPath = storage_path('logs/laravel.log');
+
+    if (!File::exists($logPath)) {
+        return response('Log file not found.', 404);
+    }
+
+    $logs = File::get($logPath);
+
+    return response("<pre>$logs</pre>");
+});
