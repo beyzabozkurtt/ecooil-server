@@ -10,6 +10,7 @@ use App\Http\Controllers\UserAppointmentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -37,3 +38,17 @@ Route::get('/user_addresses/{user_id}', [UserAddress::class, 'addresses']);
 Route::post('/updateUser/{user_id}', [ProfileController::class, 'updateUser']);
 
 Route::get('/totalUserCount', [UserController::class, 'totalUserCount']);
+
+Route::get('/debug-log', function () {
+    if (!app()->environment('local')) {
+        abort(403, 'Yasak');
+    }
+
+    $logPath = storage_path('logs/laravel.log');
+
+    if (!File::exists($logPath)) {
+        return 'Log dosyası yok.';
+    }
+
+    return nl2br(e(File::get($logPath)));
+});
