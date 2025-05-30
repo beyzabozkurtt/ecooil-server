@@ -33,6 +33,10 @@ Route::get('/userAppointments/{user_id}', [AppointmentController::class, 'userAp
 
 Route::get('userLatestAppointment/{user_id}', [AppointmentController::class, 'userLatestAppointment']);
 
+// Tüm adresleri getir
+Route::get('/user_addresses', [UserAddress::class, 'allAddresses']);
+
+// Belirli bir kullanıcının adreslerini getir
 Route::get('/user_addresses/{user_id}', [UserAddress::class, 'addresses']);
 
 Route::post('/updateUser/{user_id}', [ProfileController::class, 'updateUser']);
